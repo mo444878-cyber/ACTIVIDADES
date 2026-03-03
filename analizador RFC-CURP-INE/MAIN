@@ -1,0 +1,182 @@
+package validaciones_rfc_ine_curp;
+
+import java.awt.Desktop;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author luis-
+ */
+public class Validaciones_RFC_INE_CURP {
+
+    public static void main(String[] args) {
+
+        String archivoEntrada = "entrada.txt";
+        String archivoSalida  = "salida.txt";
+
+        limpiar(archivoSalida);
+
+        try (
+            BufferedReader lector = new BufferedReader(new FileReader(archivoEntrada));
+            BufferedWriter escritor = new BufferedWriter(new FileWriter(archivoSalida))
+        ) {
+
+            String linea;
+
+            while ((linea = lector.readLine()) != null) {
+
+                linea = linea.trim();
+
+                if (!linea.startsWith("###")) {
+                    error(escritor, " ### " + linea);
+                    continue;
+                }
+
+                String tipoBloque = linea.substring(3).toUpperCase();
+
+                if (tipoBloque.equals("FIN")) {
+                    escritor.write("Fin de procesamiento detectado");
+                    escritor.newLine();
+                    break;
+                }
+
+                int cantidad = obtenerCantidad(lector, escritor);
+                if (cantidad <= 0)
+                    break;
+
+                List<String> datos = Registros(lector, escritor, cantidad);
+                if (datos == null)
+                    break;
+
+                validacion(tipoBloque, datos, escritor);
+            }
+
+            System.out.println("Proceso completado correctamente");
+
+        } catch (FileNotFoundException e) {
+            System.out.println("No se encontro el archivo de entrada");
+        } catch (IOException e) {
+            System.out.println("Error de lectura o escritura " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error general " + e.getMessage());
+        }
+
+        abrir(archivoSalida);
+        fin();
+        eliminarSalida(archivoSalida);
+    }
+
+    private static void limpiar(String archivo) {
+        try {
+            Files.deleteIfExists(Paths.get(archivo));
+        } catch (IOException e) {
+            System.out.println("No se pudo limpiar el archivo anterior");
+        }
+    }
+
+    private static int obtenerCantidad(BufferedReader lector, BufferedWriter escritor) throws IOException {
+
+        String lineaCantidad = lector.readLine();
+
+        if (lineaCantidad == null) {
+            error(escritor, "Se esperaba numero de registros pero el archivo termino");
+            return -1;
+        }
+
+        try {
+            return Integer.parseInt(lineaCantidad.trim());
+        } catch (NumberFormatException e) {
+            error(escritor, "Cantidad invalida " + lineaCantidad);
+            return -1;
+        }
+    }
+
+    private static List<String> Registros(BufferedReader lector, BufferedWriter escritor, int cantidad) throws IOException {
+
+        List<String> lista = new ArrayList<>();
+
+        for (int i = 0; i < cantidad; i++) {
+
+            String registro = lector.readLine();
+
+            if (registro == null) {
+                error(escritor, "El archivo termino antes de completar los registros");
+                return null;
+            }
+
+            lista.add(registro.trim());
+        }
+
+        return lista;
+    }
+
+    private static void validacion(String tipo, List<String> datos, BufferedWriter escritor) throws IOException {
+
+        escritor.write("###" + tipo);
+        escritor.newLine();
+        escritor.write(String.valueOf(datos.size()));
+        escritor.newLine();
+
+        for (String dato : datos) {
+
+            boolean resultado;
+
+            switch (tipo) {
+
+                case "CURP":
+                    resultado = CURP.validarCURP(dato);
+                    break;
+
+                case "RFC":
+                    resultado = RFC.validar(dato);
+                    break;
+
+                case "INE":
+                    resultado = INE.validarINE(dato);
+                    break;
+
+                default:
+                    escritor.write("Tipo desconocido " + tipo);
+                    escritor.newLine();
+                    return;
+            }
+
+            escritor.write(dato + " -> " + (resultado ? "VALIDO" : "INVALIDO"));
+            escritor.newLine();
+        }
+
+        escritor.newLine();
+    }
+
+    private static void error(BufferedWriter escritor, String mensaje) throws IOException {
+        escritor.write("ERROR " + mensaje);
+        escritor.newLine();
+    }
+
+    private static void abrir(String archivo) {
+        try {
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(new File(archivo));
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "No fue posible mostrar el archivo generado");
+        }
+    }
+
+    private static void fin() {
+        JOptionPane.showMessageDialog(null,
+                "El programa termino su ejecucion\nPulsa OK para continuar y borrar el archivo");
+    }
+
+    private static void eliminarSalida(String archivo) {
+        try {
+            Files.deleteIfExists(Paths.get(archivo));
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null,
+                    "No se pudo quitar el archivo de salida");
+        }
+    }
+}
