@@ -1,0 +1,47 @@
+package validaciones_rfc_ine_curp;
+import java.time.LocalDate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+/**
+ *
+ * @author luis-
+ */
+public class RFC {
+ 
+
+    private static final Pattern FORMATO =
+            Pattern.compile("^[A-ZÑ&]{3,4}[0-9]{6}[A-Z0-9]{3}$");
+       public static boolean validar(String entrada) {
+
+        if (entrada == null)
+            return false;
+        String rfc = entrada.trim().toUpperCase();
+        if (rfc.length() != 12 && rfc.length() != 13)
+            return false;
+        if (!FORMATO.matcher(rfc).matches())
+            return false;
+        try {
+
+            int inicioFecha;
+        if (rfc.length() == 13) {      
+            inicioFecha = 4;
+            } else {                      
+          inicioFecha = 3;
+            }
+
+     int anio = Integer.parseInt(rfc.substring(inicioFecha, inicioFecha + 2));
+    int mes  = Integer.parseInt(rfc.substring(inicioFecha + 2, inicioFecha + 4));
+       int dia  = Integer.parseInt(rfc.substring(inicioFecha + 4, inicioFecha + 6));
+
+       int anioCompleto = (anio <= 26) ? 2000 + anio : 1900 + anio;
+
+            
+        LocalDate.of(anioCompleto, mes, dia);
+
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
