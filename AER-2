@@ -1,0 +1,56 @@
+package com.mycompany.expresiones;
+
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author luis-
+ */
+public class Expresiones {
+
+    public static void main(String[] args) {
+        
+        String cadena = JOptionPane.showInputDialog(
+                "Ingresa cadena:");
+
+        if (cadena == null || cadena.isEmpty()) {
+            JOptionPane.showMessageDialog(null,"Cadena vacia.");
+            return;
+        }
+
+        String[] tokens = cadena.split("\\s+");
+       int ent = 0;
+       int min = 0;
+       int mayu = 0;
+       int id = 0;
+       int sim = 0;
+
+        for (String palabra : tokens) {
+
+      if (palabra.matches("[0-9]+")) {
+                ent++;
+          }
+      else if (palabra.matches("[a-z]+")) {
+                min++;
+          }
+      else if (palabra.matches("[A-Z]+")) {
+                mayu++;
+         }
+      else if (palabra.matches("[a-zA-Z_$][a-zA-Z0-9_$]*")) {
+                id++;
+          }
+       else if (palabra.matches("[+\\-*/%<>=!&|^~(){}\\[\\];,.:?_#@]+")) {
+                sim++;
+          }
+        }
+
+        JOptionPane.showMessageDialog(null,
+                "RESULTADOS \n"
+                + "Enteros: " +ent + "\n"
+                + "Minusculas: " + min + "\n"
+                + "Mayusculas: " +  mayu + "\n"
+                + "Identificadores: " + id+ "\n"
+                + "Simbolos: " +sim
+        );
+    }
+    }
