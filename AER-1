@@ -1,0 +1,158 @@
+package com.mycompany.autonomas;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author luis-
+ */
+public class Autonomas {
+
+    public static void main(String[] args) {
+                String palabra;
+        int op;
+
+        // Palabras reservadas (orden cambiado)
+        String[] reservadas = {
+            "while", "int", "double", "class", "public", "private",
+            "protected", "static", "void", "if", "else", "switch",
+            "case", "break", "continue", "return", "new", "this",
+            "super", "try", "catch", "finally", "throw", "throws",
+            "import", "package", "interface", "extends", "implements",
+            "boolean", "char", "byte", "short", "long", "float",
+            "abstract", "final", "for", "do", "default", "enum",
+            "instanceof", "native", "strictfp", "synchronized",
+            "transient", "volatile", "assert", "goto", "const"
+        };
+
+        do {
+
+            try {
+                op = Integer.parseInt(JOptionPane.showInputDialog(
+                        "MENÚ DETECTOR \n"
+                        + "1) Detectar número entero\n"
+                        + "2) Detectar palabra en minúsculas\n"
+                        + "3) Detectar palabra en mayúsculas\n"
+                        + "4) Detectar identificador\n"
+                        + "5) Salir"
+                ));
+            } catch (Exception e) {
+                op = 0;
+            }
+
+            switch (op) {
+
+                case 1:
+                    palabra = JOptionPane.showInputDialog("Ingresa un número entero:");
+                    boolean esNumero = true;
+
+                    if (palabra == null || palabra.isEmpty()) {
+                        esNumero = false;
+                    } else {
+                        for (int i = 0; i < palabra.length(); i++) {
+                            char c = palabra.charAt(i);
+                            if (c < '0' || c > '9') {
+                                esNumero = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    JOptionPane.showMessageDialog(null,
+                            esNumero ? "Es un número entero válido."
+                                     : "No es un número entero válido.");
+                    break;
+
+                case 2:
+                    palabra = JOptionPane.showInputDialog("Ingresa una palabra en minúsculas:");
+                    boolean esMinuscula = true;
+
+                    if (palabra == null || palabra.isEmpty()) {
+                        esMinuscula = false;
+                    } else {
+                        for (int i = 0; i < palabra.length(); i++) {
+                            char c = palabra.charAt(i);
+                            if (c < 'a' || c > 'z') {
+                                esMinuscula = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    JOptionPane.showMessageDialog(null,
+                            esMinuscula ? "La palabra es solo minúsculas."
+                                        : "La palabra NO es solo minúsculas.");
+                    break;
+
+                case 3:
+                    palabra = JOptionPane.showInputDialog("Ingresa una palabra en mayúsculas:");
+                    boolean esMayuscula = true;
+
+                    if (palabra == null || palabra.isEmpty()) {
+                        esMayuscula = false;
+                    } else {
+                        for (int i = 0; i < palabra.length(); i++) {
+                            char c = palabra.charAt(i);
+                            if (c < 'A' || c > 'Z') {
+                                esMayuscula = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    JOptionPane.showMessageDialog(null,
+                            esMayuscula ? "La palabra es solo mayúsculas."
+                                        : "La palabra NO es solo mayúsculas.");
+                    break;
+
+                case 4:
+                    palabra = JOptionPane.showInputDialog("Ingresa un identificador:");
+                    boolean esIdentificador = true;
+
+                    if (palabra == null || palabra.isEmpty()) {
+                        esIdentificador = false;
+                    } else {
+
+                        // Validar primer carácter
+                        char primero = palabra.charAt(0);
+                        if (!Character.isLetter(primero) && primero != '_') {
+                            esIdentificador = false;
+                        }
+
+                        // Validar resto de caracteres
+                        for (int i = 1; i < palabra.length(); i++) {
+                            char c = palabra.charAt(i);
+                            if (!Character.isLetterOrDigit(c) && c != '_') {
+                                esIdentificador = false;
+                                break;
+                            }
+                        }
+
+                        // Verificar que no sea palabra reservada
+                        for (int i = 0; i < reservadas.length; i++) {
+                            if (palabra.equals(reservadas[i])) {
+                                esIdentificador = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    JOptionPane.showMessageDialog(null,
+                            esIdentificador ? "Es un identificador válido."
+                                            : "No es un identificador válido.");
+                    break;
+
+                case 5:
+                    JOptionPane.showMessageDialog(null,
+                            "Programa finalizado.");
+                    break;
+
+                default:
+                    JOptionPane.showMessageDialog(null,
+                            "Opción inválida.");
+            }
+
+        } while (op != 5);
+    }
+       
+    }
+
