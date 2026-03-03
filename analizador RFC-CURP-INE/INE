@@ -1,0 +1,49 @@
+package validaciones_rfc_ine_curp;
+import java.time.LocalDate;
+import java.time.DateTimeException;
+import java.util.regex.Pattern;
+/**
+ *
+ * @author luis-
+ */
+public class INE {
+    private static final Pattern FORMATO_INE =
+            Pattern.compile("^([A-ZÑ][B-DF-HJ-NP-TV-ZÑ]){3}\\d{6}\\d{2}[HM]\\d{3}$");
+
+    public static boolean validarINE(String texto) {
+
+        if (texto == null)
+            return false;
+
+        String valor = texto.strip().toUpperCase();
+
+        if (valor.length() != 18)
+            return false;
+
+        if (!FORMATO_INE.matcher(valor).matches())
+            return false;
+
+        try {
+
+          
+            int anio = Integer.parseInt(valor.substring(6, 8));
+            int mes  = Integer.parseInt(valor.substring(8, 10));
+            int dia  = Integer.parseInt(valor.substring(10, 12));
+
+            int anioReal = (anio <= 26) ? anio + 2000 : anio + 1900;
+
+            LocalDate.of(anioReal, mes, dia);
+
+          
+            int claveEntidad = Integer.parseInt(valor.substring(12, 14));
+
+            if (claveEntidad < 1 || claveEntidad > 32)
+                return false;
+
+        } catch (NumberFormatException | DateTimeException e) {
+            return false;
+        }
+
+        return true;
+    }
+}
