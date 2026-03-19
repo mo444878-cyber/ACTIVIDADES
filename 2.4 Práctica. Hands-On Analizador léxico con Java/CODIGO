@@ -1,0 +1,185 @@
+package autonomasssss;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.regex.*;
+import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.IOException;
+
+/**
+ *
+ * @author luis-
+ */
+public class Autonomasssss {
+  // Tipos de tokens
+    enum TipoToken {
+        LINECOMMENT, BLOCKCOMMENT, JAVADOC,
+        KEYWORD, IDENTIFIER,
+        OPERATOR, SEPARATOR,
+        FLOAT, HEX, BINARY, OCTAL, INTEGER,
+        STRING, CHARACTER,
+        SPACE, UNKNOWN
+    }
+
+    // Clase que representa un token encontrado
+    static class Token {
+        TipoToken tipo;
+        String lexema;
+        int linea;
+        int columna;
+
+        Token(TipoToken t, String l, int ln, int col) {
+            tipo = t;
+            lexema = l;
+            linea = ln;
+            columna = col;
+        }
+
+        public String toString() {
+            return String.format("%-5d | %-5d | %-15s | %s",
+                    linea, columna, tipo, lexema);
+        }
+    }
+
+    // Palabras reservadas de Java
+    static final String KEYWORDS =
+            "\\b(abstract|assert|boolean|break|byte|case|catch|char|" +
+            "class|continue|default|do|double|else|enum|extends|" +
+            "final|finally|float|for|if|implements|import|" +
+            "instanceof|int|interface|long|new|package|private|" +
+            "protected|public|return|short|static|super|switch|" +
+            "synchronized|this|throw|throws|try|void|volatile|while|" +
+            "true|false|null)\\b";
+
+    // Expresión regular principal
+    static final Pattern PATRON_GENERAL = Pattern.compile(
+
+            "(?<LINE>//[^\\n]*)|" +
+            "(?<BLOCK>/\\*[\\s\\S]*?\\*/)|" +
+            "(?<STRING>\"([^\"\\\\]|\\\\.)*\")|" +
+            "(?<CHAR>'([^'\\\\]|\\\\.)')|" +
+
+            "(?<FLOAT>[0-9]+\\.[0-9]+([eE][+-]?[0-9]+)?[fFdD]?)|" +
+            "(?<HEX>0[xX][0-9a-fA-F]+)|" +
+            "(?<BIN>0[bB][01]+)|" +
+            "(?<OCT>0[0-7]+)|" +
+            "(?<INT>[1-9][0-9]*|0)|" +
+
+            "(?<KEY>" + KEYWORDS + ")|" +
+            "(?<ID>[a-zA-Z_$][a-zA-Z0-9_$]*)|" +
+
+            "(?<OP>==|!=|<=|>=|&&|\\|\\||\\+\\+|--|\\+=|-=|\\*=|/=|[%+\\-*/<>=!&|^])|" +
+
+            "(?<SEP>[(){}\\[\\];,.])|" +
+
+            "(?<SPACE>[ \\t\\r\\n]+)"
+
+    );
+
+    // Método que realiza el análisis léxico
+    public static List<Token> analizar(String codigo) {
+
+        List<Token> lista = new ArrayList<>();
+        Matcher matcher = PATRON_GENERAL.matcher(codigo);
+
+        int linea = 1;
+        int posicion = 0;
+
+        while (matcher.find()) {
+
+            int inicioLinea = codigo.lastIndexOf('\n', matcher.start());
+            int columna = matcher.start() - inicioLinea;
+
+            if (matcher.group("SPACE") != null) {
+                linea += matcher.group().chars().filter(c -> c == '\n').count();
+            }
+            else if (matcher.group("LINE") != null)
+                lista.add(new Token(TipoToken.LINECOMMENT, matcher.group(), linea, columna));
+
+            else if (matcher.group("BLOCK") != null)
+                lista.add(new Token(TipoToken.BLOCKCOMMENT, matcher.group(), linea, columna));
+
+            else if (matcher.group("STRING") != null)
+                lista.add(new Token(TipoToken.STRING, matcher.group(), linea, columna));
+
+            else if (matcher.group("CHAR") != null)
+                lista.add(new Token(TipoToken.CHARACTER, matcher.group(), linea, columna));
+
+            else if (matcher.group("FLOAT") != null)
+                lista.add(new Token(TipoToken.FLOAT, matcher.group(), linea, columna));
+
+            else if (matcher.group("HEX") != null)
+                lista.add(new Token(TipoToken.HEX, matcher.group(), linea, columna));
+
+            else if (matcher.group("BIN") != null)
+                lista.add(new Token(TipoToken.BINARY, matcher.group(), linea, columna));
+
+            else if (matcher.group("OCT") != null)
+                lista.add(new Token(TipoToken.OCTAL, matcher.group(), linea, columna));
+
+            else if (matcher.group("INT") != null)
+                lista.add(new Token(TipoToken.INTEGER, matcher.group(), linea, columna));
+
+            else if (matcher.group("KEY") != null)
+                lista.add(new Token(TipoToken.KEYWORD, matcher.group(), linea, columna));
+
+            else if (matcher.group("ID") != null)
+                lista.add(new Token(TipoToken.IDENTIFIER, matcher.group(), linea, columna));
+
+            else if (matcher.group("OP") != null)
+                lista.add(new Token(TipoToken.OPERATOR, matcher.group(), linea, columna));
+
+            else if (matcher.group("SEP") != null)
+                lista.add(new Token(TipoToken.SEPARATOR, matcher.group(), linea, columna));
+
+            posicion = matcher.end();
+        }
+
+        return lista;
+    }
+
+    // Guarda los tokens en archivo
+    public static void guardarResultado(List<Token> tokens, String archivo) {
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(archivo))) {
+
+            bw.write("-------------------------------------------------\n");
+            bw.write("Linea | Col | Tipo de Token  | Lexema\n");
+            bw.write("-------------------------------------------------\n");
+
+            for (Token t : tokens) {
+                bw.write(t.toString());
+                bw.newLine();
+            }
+
+            bw.write("-------------------------------------------------\n");
+            bw.write("Total de tokens encontrados: " + tokens.size());
+
+        } catch (IOException e) {
+            System.out.println("Error al guardar el archivo.");
+        }
+    }
+    public static void main(String[] args) {
+
+        String archivoEntrada = "Ejemplo.java";
+        String archivoSalida = "resultado_tokens.txt";
+
+        try {
+
+            String contenido = Files.readString(Path.of(archivoEntrada));
+
+            System.out.println("Iniciando análisis léxico...");
+
+            List<Token> tokens = analizar(contenido);
+
+            guardarResultado(tokens, archivoSalida);
+
+            System.out.println("Análisis completado.");
+            System.out.println("Tokens guardados en: " + archivoSalida);
+
+        } catch (IOException e) {
+            System.out.println("No se pudo leer el archivo de entrada.");
+        }
+    }
+}
