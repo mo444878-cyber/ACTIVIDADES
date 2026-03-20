@@ -1,0 +1,19 @@
+%{
+#include <stdio.h>
+%}
+
+%%
+[a-zA-Z]{4}[0-9]{6}[a-zA-Z]{6}[a-zA-Z0-9]{2}   { printf("CURP: %s\n", yytext); }
+[ \t\n]+                                      { }
+.                                             { }
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Ingresa datos:\n");
+    yylex();
+    return 0;
+}
