@@ -1,0 +1,19 @@
+%{
+#include <stdio.h>
+%}
+
+%%
+[a-zA-Z]{3,4}[0-9]{6}[a-zA-Z0-9]{3}   { printf("RFC: %s\n", yytext); }
+[ \t\n]+                              { }
+.                                     { }
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Ingresa datos:\n");
+    yylex();
+    return 0;
+}
