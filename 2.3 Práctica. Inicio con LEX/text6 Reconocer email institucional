@@ -1,0 +1,19 @@
+%{
+#include <stdio.h>
+%}
+
+%%
+[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.edu\.mx   { printf("Email institucional: %s\n", yytext); }
+[ \t\n]+                                    { }
+.                                           { }
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Ingresa datos:\n");
+    yylex();
+    return 0;
+}
