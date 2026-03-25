@@ -1,0 +1,58 @@
+#include <iostream>
+using namespace std;
+
+// Comentario de una línea
+
+/*
+   Esto es un bloque
+   de comentarios
+*/
+
+int main() {
+
+    // ===== IDENTIFICADORES =====
+    int edad = 20;
+    float promedio = 9.5;
+    double salario = 1234.56;
+    char letra = 'A';
+
+    // ===== NÚMEROS =====
+    int entero = 100;
+    float flotante = 3.1416;
+
+    int hexadecimal = 0x1A3F;
+    int binario = 0b10101;
+    int octal = 075;
+
+    // ===== CADENAS =====
+    string nombre = "Luis Ortega";
+    string mensaje = "Hola mundo";
+
+    // ===== CARACTERES =====
+    char simbolo = '#';
+    char salto = '\n';
+
+    // ===== OPERADORES =====
+    int a = 10, b = 5;
+    int suma = a + b;
+    int resta = a - b;
+    int multi = a * b;
+    int div = a / b;
+    int mod = a % b;
+
+    a++;
+    b--;
+
+    if (a == b && a != 0) {
+        cout << "Iguales" << endl;
+    }
+
+    if (a > b || b < a) {
+        cout << "Comparación" << endl;
+    }
+
+    // ===== SEPARADORES =====
+    int arreglo[3] = {1, 2, 3};
+
+    return 0;
+}
