@@ -1,0 +1,64 @@
+%option noyywrap
+%{
+#include <stdio.h>
+#include <stdlib.h>
+FILE *output;
+%}
+%option noyywrap
+DIGITO      [0-9]
+LETRA       [a-zA-Z_]
+ID          {LETRA}({LETRA}|{DIGITO})*
+ENTERO      {DIGITO}+
+FLOTANTE    {DIGITO}+"."{DIGITO}+
+HEX         0[xX][0-9a-fA-F]+
+BIN         0[bB][01]+
+OCT         0[0-7]+
+CADENA      \"([^\"\\]|\\.)*\"
+CARACTER    \'([^\'\\]|\\.)\'
+RESERVADAS  int|float|double|char|if|else|while|for|return|void|class|public|private|protected|include|using|namespace|std|cout|cin
+OPERADORES  \+|\-|\*|\/|\%|\=|\==|\!=|\<|\>|\<=|\>=|\+\+|\-\-|\&&|\|\||
+SEPARADORES \(|\)|\{|\}|\[|\]|\,|\;|\:|\.
+COMENTARIO_LINEA    \/\/.*
+COMENTARIO_BLOQUE   \/\*([^*]|\*+[^*/])*\*+\/
+%%
+{RESERVADAS}        { fprintf(output, "RESERVADA: %s\n", yytext); }
+{HEX}               { fprintf(output, "HEX: %s\n", yytext); }
+{BIN}               { fprintf(output, "BINARIO: %s\n", yytext); }
+{OCT}               { fprintf(output, "OCTAL: %s\n", yytext); }
+{FLOTANTE}          { fprintf(output, "FLOTANTE: %s\n", yytext); }
+{ENTERO}            { fprintf(output, "ENTERO: %s\n", yytext); }
+{CADENA}            { fprintf(output, "CADENA: %s\n", yytext); }
+{CARACTER}          { fprintf(output, "CARACTER: %s\n", yytext); }
+{ID}                { fprintf(output, "IDENTIFICADOR: %s\n", yytext); }
+{OPERADORES}        { fprintf(output, "OPERADOR: %s\n", yytext); }
+{SEPARADORES}       { fprintf(output, "SEPARADOR: %s\n", yytext); }
+{COMENTARIO_LINEA}  { fprintf(output, "COMENTARIO LINEA: %s\n", yytext); }
+{COMENTARIO_BLOQUE} { fprintf(output, "COMENTARIO BLOQUE: %s\n", yytext); }
+[ \t\n]+            { /* ignorar espacios */ }
+.                   { fprintf(output, "DESCONOCIDO: %s\n", yytext); }
+
+%%
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Uso: %s codigo.cpp\n", argv[0]);
+        return 1;
+    }
+
+    FILE *input = fopen(argv[1], "r");
+    if (!input) {
+        printf("Error\n");
+        return 1;
+    }
+
+    output = fopen("MyScanner.txt", "w");
+
+    yyin = input;
+    yylex();
+
+    fclose(input);
+    fclose(output);
+
+    printf("Terminado. Ver MyScanner.txt\n");
+
+    return 0;
+}
