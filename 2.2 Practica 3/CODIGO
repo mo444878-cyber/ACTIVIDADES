@@ -1,0 +1,123 @@
+package afd;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import javax.swing.JOptionPane;
+/**
+ *
+ * @author luis-
+ */
+public class AFD {
+
+    public static void main(String[] args) {
+             int N=0,S=0,D=0,q0=0,T=0,C=0;
+        while(true){
+            try{
+         String datos = JOptionPane.showInputDialog("Ingrese: N S D q0 T C\n"
+         + "Ingrese con espacios como esta escrita la indicacion");
+
+                if(datos == null || datos.trim().isEmpty())
+               throw new Exception("Entrada vaca");
+
+                String[] partes = datos.trim().split("\\s+");
+
+                N = Integer.parseInt(partes[0]);
+                S = Integer.parseInt(partes[1]);
+                D = Integer.parseInt(partes[2]);
+                q0 = Integer.parseInt(partes[3]);
+                T = Integer.parseInt(partes[4]);
+                C = Integer.parseInt(partes[5]);
+
+                break;
+
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null,"Error en los datos. Intente nuevamente.");
+            }
+        }
+
+        // Alfa
+        String[] alfabeto = JOptionPane.showInputDialog("Ingrese el alfabeto (ej: 0 1)")
+                .trim().split("\\s+");
+
+        // Estados F
+        Set<Integer> finales = new HashSet<>();
+
+        while(true){
+            try{
+
+                String entrada = JOptionPane.showInputDialog("Ingrese estados finales");
+
+                String[] f = entrada.trim().split("\\s+");
+
+                for(String s : f){
+                    finales.add(Integer.parseInt(s));
+                }
+
+                break;
+
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null,"Error en estados finales.");
+            }
+        }
+
+        //LaS Transiciones
+        Map<String,Integer> transiciones = new HashMap<>();
+
+        for(int i=0;i<D;i++){
+
+            while(true){
+                try{
+
+                    String t = JOptionPane.showInputDialog(
+                            "Transición "+(i+1)+"\nFormato: estado simbolo estado");
+
+                    String[] datos = t.trim().split("\\s+");
+
+                    int inicio = Integer.parseInt(datos[0]);
+                    String simbolo = datos[1];
+                    int destino = Integer.parseInt(datos[2]);
+
+                    transiciones.put(inicio + "," + simbolo, destino);
+
+                    break;
+
+                }catch(Exception e){
+                    JOptionPane.showMessageDialog(null,"Transición inválida, intente nuevamente.");
+                }
+            }
+        }
+
+        String resultado="";
+
+        // Las cadenas
+        for(int i=0;i<C;i++){
+
+            String cadena = JOptionPane.showInputDialog("Cadena "+(i+1));
+
+            int estadoActual = q0;
+            boolean aceptada = true;
+
+            for(char c : cadena.toCharArray()){
+
+                String clave = estadoActual + "," + String.valueOf(c);
+
+                if(transiciones.containsKey(clave)){
+                    estadoActual = transiciones.get(clave);
+                }else{
+                    aceptada=false;
+                    break;
+                }
+            }
+
+            if(aceptada && finales.contains(estadoActual))
+                resultado += cadena + " -> ACEPTADA\n";
+            else
+                resultado += cadena + " -> RECHAZADA\n";
+        }
+
+        JOptionPane.showMessageDialog(null,resultado);
+    }
+    }
+    
+
